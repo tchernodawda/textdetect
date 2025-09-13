@@ -1,0 +1,19 @@
+
+.content {
+  font-family: "Source code pro", Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.audio-white {
+  font-family: "Audiowide", sans-serif;
+}
+
+.temoignages {
+  font-family: "Kaushan Script", cursive; 
+}
+
+.background-image {
+  background-image: url("{% static 'img/bg2.jpg' %}");
+  background-image: url('static/img/bg2.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}

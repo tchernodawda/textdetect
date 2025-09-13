@@ -1,0 +1,8 @@
+env
+.env
+.vscode
+__pycache__
+db.sqlite3
+*.pyc
+*.pyo
+migrations

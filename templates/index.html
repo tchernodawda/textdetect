@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Accueil - TextDetect {% endblock title %}
+
+{% block content %}
+<div class="content container mt-1 background-image">
+    <h2>Bienvenue sur <b><span class="audio-white">TextDetect</span></b> : Détection de Texte IA & Humaine</h2>
+    <small><b>Votre solution pour détecter l'auteur d'un texte avec précision</b></small>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <h3>Qu'est-ce que TextDetect ?</h3>
+            <p>TextDetect est une application innovante qui combine l'intelligence artificielle avancée avec l'expertise humaine pour offrir une détection de texte d'une précision exceptionnelle.</p>
+        </div>
+        <div class="col-md-4">
+            <h3> À quoi peut sevir TextDetect ?</h3>
+            <ul>
+                <li>Lutter contre la desinformation</li>
+                <li>Preserver l'integrité académique</li>
+                <li>Protection des droits d'auteur</li>
+                <li>Garantir une communication transparente et honnête</li>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <h3>Pourquoi choisir TextDetect ?</h3>
+            <ul>
+                <li>Précision et Rapidité</li>
+                <li>Adaptabilité</li>
+                <li>Confidentialité</li>
+                <li>Sécurité</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="text-center col-md-12">
+            <h2 class= "temoignages"><b>Témoignages</b></h2>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text"><b>Niassy</b> : "TextDetect a vraiment simplifié notre processus de détection de texte. C'est incroyablement précis et rapide!"</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text"><b>Michel</b> :"Nous utilisons TextDetect depuis des mois maintenant et nous sommes très satisfaits de ses performances et de sa fiabilité."</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text"><b>Ameth</b> :"Je recommande vivement TextDetect à tous ceux qui recherchent une solution de détection de texte efficace et facile à utiliser."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="{% url 'predict' %}" class="animate__backOutDown btn btn-dark btn-lg">Essayez maintenant</a>
+</div>
+<br>
+
+{% endblock content %}
+
+{% block footer %}
+<footer class="content footer fixed-bottom mt-auto py-4 bg-light">
+    <div class="container">
+        <h4>Besoin d'aide ?</h4>
+        <p>N'hésitez pas à nous contacter via <b>pic@ept.sn</b> si vous avez des questions ou des préoccupations. Notre équipe est là pour vous aider !</p>
+    </div>
+</footer>
+{% endblock footer %}
+
+
+
+
+
+

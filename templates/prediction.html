@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+     
+{% block title %} Prediction{% endblock title %}
+{% block content %}
+<style>
+    body {
+      background-image: url("{% static 'img/img2.jpg' %}");
+      background-size: 1250px;
+      background-repeat: no-repeat;
+      background-color: rgba(255, 255, 255, 0.2); 
+    }
+</style>
+
+<div class="container background-image">
+    <p class="text-center mt-4"> 
+        <b>Classé n°1 des meilleurs détecteurs d'IA par les élèves en GIT</b>. Utilisez notre détecteur d'IA pour vérifier si votre texte sera signalé comme contenu écrit par l'IA.
+    <p>
+    <h3 class="text-center mt-5 text-dark"><b>Veuillez entrer votre texte :</b></h3>
+    <br>   
+    </p>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 text-center">
+                <form id="predictionForm" method="post">
+                    {% csrf_token %}
+                    <textarea name="text_to_predict" rows="10" cols="50" style="border-width: 3px; box-shadow: 0 0 100px rgba(0, 0, 0, 0.2);" placeholder="Votre texte ...">{{text_to_predict}}</textarea><br>
+                    <input type="submit" value="Predict" class="animate__heartBeat btn btn-dark mt-3">
+                </form>
+                <div id="predictionResult"></div>
+            </div>
+        </div>
+    </div>
+    </div>  
+
+    <br>
+
+    <div class="text-center" id="predictionResult">
+        {% if resultat %}
+            <h1>Votre texte est écrit par un {{ resultat }}.</h1>
+        {% endif %}
+    </div>  
+
+{% endblock content %}  
+
+{% block footer %}
+<footer class="content footer fixed-bottom mt-auto py-4 bg-light">
+    <div class="container">
+        <h5>Besoin d'aide ?</h5>
+        <p>N'hésitez pas à nous contacter via <b>pic@ept.sn</b> si vous avez des questions ou des préoccupations. Notre équipe est là pour vous aider !</p>
+    </div>
+</footer>
+{% endblock footer %}
+
+
+     
+
+     
