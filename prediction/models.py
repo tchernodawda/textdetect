@@ -1,115 +1,115 @@
 from django.db import models
 
-import pandas as pd
+import os
 import joblib
 import numpy as np
 import string
 import spacy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords, wordnet
+from nltk.corpus import stopwords
+import nltk
+
+# ---------------------------------------------------------------------------
+# Ensure required NLTK resources are present (safe to call multiple times)
+# ---------------------------------------------------------------------------
+for resource, path in [
+    ("tokenizers/punkt", "punkt"),
+    ("tokenizers/punkt_tab", "punkt_tab"),
+    ("corpora/stopwords", "stopwords"),
+]:
+    try:
+        nltk.data.find(resource)
+    except LookupError:
+        nltk.download(path, quiet=True)
+
+# ---------------------------------------------------------------------------
+# Load spaCy model once at module level (not inside the function)
+# ---------------------------------------------------------------------------
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    raise OSError(
+        "spaCy model 'en_core_web_sm' not found. "
+        "Run: python -m spacy download en_core_web_sm"
+    )
+
+# ---------------------------------------------------------------------------
+# Load ML artefacts using absolute paths relative to this file
+# ---------------------------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+_model_path = os.path.join(BASE_DIR, "logistic_regression_model.pkl")
+_vectorizer_path = os.path.join(BASE_DIR, "tfidf_vectorizer.pkl")
+
+if not os.path.exists(_model_path):
+    raise FileNotFoundError(
+        f"Model file not found: {_model_path}\n"
+        "Make sure 'logistic_regression_model.pkl' is at the project root."
+    )
+if not os.path.exists(_vectorizer_path):
+    raise FileNotFoundError(
+        f"Vectorizer file not found: {_vectorizer_path}\n"
+        "Make sure 'tfidf_vectorizer.pkl' is at the project root."
+    )
+
+loaded_model2 = joblib.load(_model_path)
+vectorizer2 = joblib.load(_vectorizer_path)
+
+# ---------------------------------------------------------------------------
+# Feature engineering helpers
+# ---------------------------------------------------------------------------
+
+stop_words = set(stopwords.words("english"))
+linking_words = {"to", "the", "and", "of", "in", "on", "for", "with", "at", "a", "an"}
 
 
-
-stop_words = set(stopwords.words('english'))
-linking_words = {'to', 'the', 'and', 'of', 'in', 'on', 'for', 'with', 'at', 'a', 'an'}
-
-
-# compter le nombre de pnctuations
-def count_punctuation_marks(text):
-    punctuation_count = sum(1 for char in text if char in string.punctuation)
-    return punctuation_count
+def count_punctuation_marks(text: str) -> int:
+    return sum(1 for char in text if char in string.punctuation)
 
 
-# compter le nombre de mots de liaison
-def count_linking_words(text):
-    linking_words_count = sum(1 for word in word_tokenize(
-        text.lower()) if word in linking_words)
-    return linking_words_count
+def count_linking_words(text: str) -> int:
+    return sum(1 for word in word_tokenize(text.lower()) if word in linking_words)
 
 
-# Function to calculate percentage of synonyms in a text
-def calculate_punctuation_count(text):
+def calculate_punctuation_count(text: str) -> float:
     tokens = word_tokenize(text)
-    if len(tokens) > 0:
-        return count_punctuation_marks(text) / len(tokens) * 100
-    else:
-        # pour eviter le zerodivisionerror
-        return 0
-
-# Function to calculate percentage of synonyms in a text
+    return count_punctuation_marks(text) / len(tokens) * 100 if tokens else 0.0
 
 
-def calculate_linking_words_count(text):
+def calculate_linking_words_count(text: str) -> float:
     tokens = word_tokenize(text)
-    if len(tokens) > 0:
-        return count_linking_words(text) / len(tokens) * 100
-    else:
-        return 0
-
-# Fonction pour effectuer l'analyse lexicale et syntaxique d'un texte et calculer le pourcentage de fiabilité lexicale
+    return count_linking_words(text) / len(tokens) * 100 if tokens else 0.0
 
 
-def analyze_text_and_compute_lexical_reliability(text):
-    nlp = spacy.load('en_core_web_sm')
-    
-    # Traiter le texte avec spaCy
+def analyze_text_and_compute_lexical_reliability(text: str) -> float:
+    """
+    Compute the percentage of content tokens (non-stop, non-punct)
+    using the module-level spaCy pipeline loaded once at startup.
+    """
     doc = nlp(text)
-
-    # Initialiser le compteur pour les tokens corrects
-    correct_tokens = 0
-
-    # Parcourir chaque token dans le texte
-    for token in doc:
-        # Vérifier si le token est correct (non-stopword et non-punctuation)
-        if not token.is_stop and not token.is_punct:
-            # Incrémenter le compteur des tokens corrects
-            correct_tokens += 1
-
-    # Calculer le pourcentage de fiabilité lexicale
-    lexical_reliability_percentage = (correct_tokens / len(doc)) * 100
-
-    return lexical_reliability_percentage
+    if len(doc) == 0:
+        return 0.0
+    correct_tokens = sum(
+        1 for token in doc if not token.is_stop and not token.is_punct
+    )
+    return (correct_tokens / len(doc)) * 100
 
 
-def preprocess_text_for_prediction(text):
-    # Analyse lexicale et syntaxique du texte avec spaCy pour calculer la fiabilité lexicale
-    lexical_reliability_percentage = analyze_text_and_compute_lexical_reliability(
-        text)
+def preprocess_text_for_prediction(text: str) -> np.ndarray:
+    """
+    Build the feature matrix for a single input text:
+      - punctuation % 
+      - linking words %
+      - lexical reliability %
+      - TF-IDF vector (concatenated)
+    """
+    lexical_reliability = analyze_text_and_compute_lexical_reliability(text)
+    punctuation_pct = calculate_punctuation_count(text)
+    linking_words_pct = calculate_linking_words_count(text)
 
-    # Compter le nombre de ponctuations et de mots de liaison
-    punctuation_percentage = calculate_punctuation_count(text)
-    linking_words_percentage = calculate_linking_words_count(text)
-
-    # Vectorisation du texte avec TfidfVectorizer
     text_vectorized = vectorizer2.transform([text])
 
-    # Concaténation de toutes les fonctionnalités
-    features = np.array([
-        [punctuation_percentage, linking_words_percentage,
-            lexical_reliability_percentage]
-    ])
-
-    # Concaténer les vecteurs de texte avec les autres fonctionnalités
-    features = np.concatenate((features, text_vectorized.toarray()), axis=1)
-
-    # Retourne les données prêtes pour la prédiction
+    handcrafted = np.array([[punctuation_pct, linking_words_pct, lexical_reliability]])
+    features = np.concatenate((handcrafted, text_vectorized.toarray()), axis=1)
     return features
-
-
-df_copy = pd.read_csv(r"final_dataframef21.csv", encoding="utf-8")
-
-# Charger le modèle et le vectorizer
-loaded_model2 = joblib.load(r"logistic_regression_model2.pkl")
-
-# Charger le vectoriseur à partir du fichier
-vectorizer2 = joblib.load(r"tfidf_vectorizer.pkl")
-
-# # Prétraitement du texte pour la prédiction
-# text_to_predict = "Votre texte ici"
-# preprocessed_text = preprocess_text_for_prediction(text_to_predict)
-
-# # Prédiction
-# prediction = loaded_model2.predict(preprocessed_text)
-# print("Le texte est prédit comme:", prediction)
-

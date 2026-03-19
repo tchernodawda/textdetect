@@ -1,9 +1,20 @@
-django
-pandas
-numpy
-requests
-joblib
-scikit-learn
-matplotlib
-spacy
-nltk
+# Web framework
+django>=4.2,<5.0
+
+# ML & data
+scikit-learn>=1.3,<2.0
+joblib>=1.3,<2.0
+numpy>=1.24,<2.0
+pandas>=2.0,<3.0
+
+# NLP
+nltk>=3.8,<4.0
+spacy>=3.6,<4.0
+
+# Utilities
+requests>=2.31,<3.0
+matplotlib>=3.7,<4.0
+
+# After installing, download NLP resources:
+#   python -m spacy download en_core_web_sm
+#   python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords')"
