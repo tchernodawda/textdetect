@@ -15,15 +15,11 @@
 
 </div>
 
----
-
 ## Overview
 
 TextDetect addresses a growing real-world challenge: distinguishing AI-generated content from human writing. The project combines classical NLP feature engineering with TF-IDF vectorisation, training a cross-validated Logistic Regression model on a balanced dataset of 130,000 human texts and 130,000 AI-generated texts.
 
 The trained model is served through a lightweight Django web interface where any user can paste a text and get an instant prediction.
-
----
 
 ## ML Pipeline
 
@@ -85,8 +81,6 @@ LogisticRegressionCV.predict()
 
 Both files are committed to the repository and loaded once at Django startup — no re-training required to run the app.
 
----
-
 ## Web Application
 
 The Django app has two pages:
@@ -98,12 +92,10 @@ The Django app has two pages:
 
 The `predict` view accepts a `POST` with `text_to_predict` in the form body, runs the full inference pipeline, and renders the result inline on the same page.
 
----
-
 ## Project Structure
 
 ```
-ai-generated-vs-human-written-text/
+textdetect/
 ├── ProjetML/
 │   ├── settings.py           # Django configuration
 │   ├── urls.py               # Root URL dispatcher
@@ -138,8 +130,6 @@ ai-generated-vs-human-written-text/
 └── README.md
 ```
 
----
-
 ## Setup & Installation
 
 ### Prerequisites
@@ -153,8 +143,8 @@ ai-generated-vs-human-written-text/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/thiernodaoudaly/ai-generated-vs-human-written-text.git
-cd ai-generated-vs-human-written-text
+git clone https://github.com/thiernodaooudaly/textdetect.git
+cd textdetect
 
 # 2. Create and activate a virtual environment
 python -m venv venv
@@ -178,8 +168,6 @@ Open `http://127.0.0.1:8000` in your browser.
 
 > **Note:** NLTK resources (`punkt`, `punkt_tab`, `stopwords`) are downloaded automatically on first run if not already present — no manual step required.
 
----
-
 ## Using the App
 
 1. Go to `http://127.0.0.1:8000/predict/`
@@ -194,8 +182,6 @@ Open `http://127.0.0.1:8000` in your browser.
 
 *Human-written (likely):*
 > "I wrote this at 2am after three coffees because the deadline was the next morning and I still had no idea what I was doing."
-
----
 
 ## Exploring the Notebook
 
@@ -219,8 +205,6 @@ jupyter notebook notebook.ipynb
 # Run all cells
 ```
 
----
-
 ## Bugs Fixed (vs. original version)
 
 The following issues were identified and corrected:
@@ -235,8 +219,6 @@ The following issues were identified and corrected:
 | `ProjetML/settings.py` | `STATIC_URL`, `STATICFILES_DIRS`, `DEFAULT_AUTO_FIELD` duplicated | Duplicate block removed |
 | `requirements.txt` | No pinned versions — silent dependency conflicts between environments | Added version ranges per package group |
 
----
-
 ## Roadmap
 
 - [ ] Display a confidence score (probability) alongside the prediction
@@ -245,15 +227,11 @@ The following issues were identified and corrected:
 - [ ] Add a REST API endpoint for programmatic access
 - [ ] Deploy on a public platform (Railway, Render, or HuggingFace Spaces)
 
----
-
 ## Contributors
 
 - Mouhamed CAMARA
 - Thierno Daouda LY
 - Mouhamed El Bachir TRAORE
-
----
 
 ## License
 
